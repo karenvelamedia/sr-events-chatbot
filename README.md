@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SR Events – E-postassistent (demo)
 
-## Getting Started
+En liten Next.js-app som demonstrerer en AI-drevet e-postassistent for SR Events.
+Bruker Claude Sonnet 4.6 via Anthropic API med en omfattende systemprompt
+(`src/lib/system-prompt.ts`) basert på Christians egen agentdokumentasjon.
 
-First, run the development server:
+## Kjør lokalt
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Opprett `.env.local` ved å kopiere `.env.example` og legge inn din
+   Anthropic API-nøkkel:
+   ```bash
+   cp .env.example .env.local
+   # rediger .env.local og lim inn nøkkelen fra console.anthropic.com
+   ```
+2. Installer (allerede gjort hvis du kjørte `npm install`):
+   ```bash
+   npm install
+   ```
+3. Start dev-serveren:
+   ```bash
+   npm run dev
+   ```
+4. Åpne [http://localhost:3000](http://localhost:3000).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deploy til Vercel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Lag nytt repo på GitHub og push koden dit.
+2. Gå til [vercel.com/new](https://vercel.com/new), importer repoet.
+3. Under "Environment Variables": legg inn `ANTHROPIC_API_KEY` med
+   nøkkelen fra Anthropic Console.
+4. Klikk Deploy.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Etter deploy får du en lenke (f.eks. `sr-events-agent.vercel.app`) som
+du kan sende til Christian.
 
-## Learn More
+## Endre systemprompten
 
-To learn more about Next.js, take a look at the following resources:
+Hele instruks-settet ligger i [`src/lib/system-prompt.ts`](src/lib/system-prompt.ts).
+Endrer du innholdet der, oppdaterer du agentens oppførsel. Bruker prompt
+caching, så små endringer er rimelig — store endringer invalideres cachen
+og koster mer på første spørring.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Endre eksempler
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Eksempel-knappene øverst på siden defineres i
+[`src/lib/examples.ts`](src/lib/examples.ts).
