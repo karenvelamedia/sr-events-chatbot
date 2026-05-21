@@ -83,7 +83,11 @@ export async function POST(req: NextRequest) {
     await logInteraction({
       endpoint: "/api/lead",
       input: { contact, messages },
-      output: { subject, details, resendId: sendResult.data?.id ?? null },
+      output: JSON.stringify(
+        { subject, details, resendId: sendResult.data?.id ?? null },
+        null,
+        2,
+      ),
     });
 
     return NextResponse.json({
