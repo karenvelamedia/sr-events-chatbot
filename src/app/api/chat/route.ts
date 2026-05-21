@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
-import { CHAT_SYSTEM_PROMPT } from "@/lib/chat-system-prompt";
+import { getChatSystemPrompt } from "@/lib/chat-system-prompt";
 import { logInteraction } from "@/lib/log";
 
 export const runtime = "nodejs";
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       system: [
         {
           type: "text",
-          text: CHAT_SYSTEM_PROMPT,
+          text: getChatSystemPrompt(),
           cache_control: { type: "ephemeral" },
         },
       ],

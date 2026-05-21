@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
-import { SYSTEM_PROMPT } from "@/lib/system-prompt";
+import { getSystemPrompt } from "@/lib/system-prompt";
 import { logInteraction } from "@/lib/log";
 
 export const runtime = "nodejs";
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       system: [
         {
           type: "text",
-          text: SYSTEM_PROMPT,
+          text: getSystemPrompt(),
           cache_control: { type: "ephemeral" },
         },
       ],
