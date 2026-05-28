@@ -1,5 +1,6 @@
 import { appendFile, mkdir } from "node:fs/promises";
 import path from "node:path";
+import { supabase } from "./supabase";
 
 const LOG_DIR = path.join(process.cwd(), "logs");
 const LOG_FILE = path.join(LOG_DIR, "ai-interactions.log");
@@ -16,6 +17,19 @@ export async function logInteraction(entry: {
     typeof entry.input === "string"
       ? entry.input
       : JSON.stringify(entry.input, null, 2);
+
+  if (supabase) {
+    try {
+      const { error } = await supabase.from("chat_interactions").insert({
+        endpoint: entry.endpoint,
+        input: typeof entry.input === "string" ? { text: entry.input } : entry.input,
+        output: entry.output,
+      });
+      if (error) console.error("Supabase log error:", error);
+    } catch (err) {
+      console.error("Supabase log error:", err);
+    }
+  }
 
   if (IS_SERVERLESS) {
     console.log(
