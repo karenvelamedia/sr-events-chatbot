@@ -17,6 +17,10 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const messages = body?.messages as ChatMessage[] | undefined;
+    const sessionId =
+      typeof body?.session_id === "string" && body.session_id.trim().length > 0
+        ? body.session_id.trim().slice(0, 100)
+        : undefined;
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
@@ -73,6 +77,7 @@ export async function POST(req: NextRequest) {
       endpoint: "/api/chat",
       input: sanitized,
       output: text,
+      sessionId,
     });
 
     return NextResponse.json({ svar: text });

@@ -15,6 +15,34 @@ const WELCOME: ChatMessage = {
 
 const FORM_MARKER = "[KONTAKTSKJEMA]";
 
+const SESSION_STORAGE_KEY = "sr-events-chat-session";
+
+function newSessionId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  // Fallback for eldre nettlesere uten crypto.randomUUID
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+function getOrCreateSessionId(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    const existing = window.localStorage.getItem(SESSION_STORAGE_KEY);
+    if (existing) return existing;
+    const fresh = newSessionId();
+    window.localStorage.setItem(SESSION_STORAGE_KEY, fresh);
+    return fresh;
+  } catch {
+    // localStorage utilgjengelig (privat modus o.l.) — kjør uten persistens
+    return newSessionId();
+  }
+}
+
 type ChatWidgetProps = {
   className?: string;
 };
@@ -28,6 +56,11 @@ export function ChatWidget({ className = "" }: ChatWidgetProps) {
   const [form, setForm] = useState({ navn: "", epost: "", telefon: "" });
   const [formError, setFormError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const sessionIdRef = useRef<string>("");
+
+  useEffect(() => {
+    sessionIdRef.current = getOrCreateSessionId();
+  }, []);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -50,6 +83,7 @@ export function ChatWidget({ className = "" }: ChatWidgetProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          session_id: sessionIdRef.current,
           messages: nyMeldinger.map(({ role, content }) => ({ role, content })),
         }),
       });
@@ -78,6 +112,14 @@ export function ChatWidget({ className = "" }: ChatWidgetProps) {
   }
 
   function handleReset() {
+    // Ny samtale = ny økt, slik at sammendraget gjelder én samtale
+    const fresh = newSessionId();
+    sessionIdRef.current = fresh;
+    try {
+      window.localStorage.setItem(SESSION_STORAGE_KEY, fresh);
+    } catch {
+      // ignorer hvis localStorage er utilgjengelig
+    }
     setMessages([WELCOME]);
     setInput("");
     setError(null);

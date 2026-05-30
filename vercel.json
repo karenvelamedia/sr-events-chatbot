@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/send-chat-summaries",
+      "schedule": "*/15 * * * *"
+    }
+  ]
+}

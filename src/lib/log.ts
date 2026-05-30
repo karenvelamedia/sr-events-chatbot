@@ -11,6 +11,7 @@ export async function logInteraction(entry: {
   endpoint: string;
   input: unknown;
   output: string;
+  sessionId?: string;
 }) {
   const timestamp = new Date().toISOString();
   const inputText =
@@ -24,6 +25,7 @@ export async function logInteraction(entry: {
         endpoint: entry.endpoint,
         input: typeof entry.input === "string" ? { text: entry.input } : entry.input,
         output: entry.output,
+        session_id: entry.sessionId ?? null,
       });
       if (error) console.error("Supabase log error:", error);
     } catch (err) {
